@@ -1,68 +1,82 @@
-#arrays
+# Arrays
 
-##majority element
-we consider the element as the majority element if the frequency of the element in the array is greater than the floor value of n/2
+## Majority Element
 
-code:(this is the brute force approach)
+We consider an element the **majority element** if its frequency in the array is greater than `floor(n / 2)`.
 
-for(value: nums){
-	int freq;
-	
-	for(ele: nums){
-		if(ele == value){
-			freq++;
-		}
-	}
-	
-	if(freq > n/2){
-		return ele;
-	}
+**Brute force approach:**
+
+```cpp
+for (int value : nums) {
+    int freq = 0;
+
+    for (int ele : nums) {
+        if (ele == value) {
+            freq++;
+        }
+    }
+
+    if (freq > n / 2) {
+        return value;
+    }
 }
+```
 
 ---
-## products of the elements in the array except self
 
-//this is the brute force approach
-vector<int> answer
-for(int i = 0; i < n; i++){
-	int prod = 1;
-	for(j = 0; j < n; j++){
-		if(i != j){
-			prod = prod * i;
-		}
-	ans[i] = prod;
-	}
+## Product of the Array Except Self
+
+**Brute force approach:**
+
+```cpp
+vector<int> answer(n);
+
+for (int i = 0; i < n; i++) {
+    int prod = 1;
+    for (int j = 0; j < n; j++) {
+        if (i != j) {
+            prod = prod * nums[j];
+        }
+    }
+    answer[i] = prod;
 }
+```
 
-//optimised approach
+**Optimized approach (prefix / suffix products):**
+
+```cpp
 class Solution {
 public:
     vector<int> productExceptSelf(vector<int>& nums) {
-
         int n = nums.size();
         vector<int> answer(n, 1);
         vector<int> prefix(n, 1);
         vector<int> suffix(n, 1);
+
         prefix[0] = 1;
         suffix[n - 1] = 1;
 
-        //loop for prefix
-        for(int i = 1; i < n; i++){
+        // prefix products
+        for (int i = 1; i < n; i++) {
             prefix[i] = prefix[i - 1] * nums[i - 1];
         }
 
-        //loop for suffix
-        for(int j = n - 2; j >= 0; j--){
+        // suffix products
+        for (int j = n - 2; j >= 0; j--) {
             suffix[j] = suffix[j + 1] * nums[j + 1];
         }
 
-        //loop to get the answer
-        for(int k = 0; k < n; k++){
+        // combine
+        for (int k = 0; k < n; k++) {
             answer[k] = prefix[k] * suffix[k];
         }
+
         return answer;
     }
 };
+```
+
+---
 
 # C++ Pointers for LeetCode — Notes
 
@@ -74,9 +88,9 @@ public:
 
 ```cpp
 int x = 10;
-int* p = &x;      // p holds address of x
-cout << *p;         // dereference: 10
-*p = 20;             // x is now 20
+int* p = &x;   // p holds address of x
+cout << *p;    // dereference: 10
+*p = 20;       // x is now 20
 ```
 
 - `&x` → address-of
@@ -95,7 +109,7 @@ The most important C++-specific concept to internalize.
 ```cpp
 int x = 10;
 int& r = x;   // r is an alias for x, NOT a pointer
-r = 20;        // x becomes 20
+r = 20;       // x becomes 20
 ```
 
 **Differences from pointers:**
@@ -109,6 +123,7 @@ Function parameters — to avoid copying and to modify the caller's data directl
 
 ```cpp
 void increment(int& x) { x++; }        // pass by reference — modifies original
+
 void print(const vector<int>& nums) {  // pass by const reference — avoids copy, read-only
     for (int n : nums) cout << n;
 }
@@ -148,7 +163,7 @@ struct ListNode {
 };
 
 ListNode* node = new ListNode(5);   // allocates + calls constructor
-delete node;                          // frees (rarely needed on LeetCode)
+delete node;                        // frees (rarely needed on LeetCode)
 ```
 
 `new` combines allocation + initialization and returns a properly-typed pointer (no cast needed, unlike `malloc`).
@@ -160,10 +175,10 @@ delete node;                          // frees (rarely needed on LeetCode)
 ## 5. Pointer Arithmetic & Arrays — same as C
 
 ```cpp
-int arr[5] = {1,2,3,4,5};
-int* p = arr;        // decays to pointer to first element
-cout << *(p+2);       // 3
-cout << p[2];          // 3, same thing
+int arr[5] = {1, 2, 3, 4, 5};
+int* p = arr;      // decays to pointer to first element
+cout << *(p + 2);  // 3
+cout << p[2];      // 3, same thing
 ```
 
 Matters less on LeetCode since `vector<int>` is used instead of raw arrays most of the time, but decay rules are identical to C.
@@ -197,9 +212,9 @@ ListNode* reverseList(ListNode* head) {
 Read right-to-left:
 
 ```cpp
-const int* p;        // pointer to const int — can't modify *p, CAN reassign p
-int* const p;         // const pointer to int — CAN modify *p, can't reassign p
-const int* const p;  // neither can change
+const int* p;         // pointer to const int — can't modify *p, CAN reassign p
+int* const p;          // const pointer to int — CAN modify *p, can't reassign p
+const int* const p;   // neither can change
 ```
 
 Most given LeetCode function signatures use `const vector<int>&` for read-only inputs.
@@ -211,7 +226,7 @@ Most given LeetCode function signatures use `const vector<int>&` for read-only i
 C++11 RAII-style automatic memory management:
 
 ```cpp
-unique_ptr<int> p = make_unique<int>(5);   // auto-deleted when p goes out of scope
+unique_ptr<int> p = make_unique<int>(5);    // auto-deleted when p goes out of scope
 shared_ptr<int> sp = make_shared<int>(5);   // reference-counted
 ```
 
@@ -240,7 +255,7 @@ Typical recursive traversal:
 
 ```cpp
 int maxDepth(TreeNode* root) {
-    if (!root) return 0;                 // null check, same as C
+    if (!root) return 0;   // null check, same as C
     return 1 + max(maxDepth(root->left), maxDepth(root->right));
 }
 ```
@@ -273,7 +288,7 @@ Don't confuse the idiom's name with real `int*` pointer arithmetic — 95% of th
 STL containers expose iterators, which behave like pointers (`*it`, `it++`) but work uniformly across container types.
 
 ```cpp
-vector<int> v = {1,2,3};
+vector<int> v = {1, 2, 3};
 for (auto it = v.begin(); it != v.end(); ++it) {
     cout << *it;
 }
