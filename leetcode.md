@@ -89,3 +89,56 @@ num    → if num > second → triplet exists
 ```
 
 **Pattern:** Maintain the smallest possible values for the first and second positions of the subsequence.
+
+
+# 🍬 LeetCode 1431 — Kids With the Greatest Number of Candies
+
+---
+
+## 📋 Question Summary
+Given an array `candies` where `candies[i]` is the number of candies the `i`-th kid has, and an integer `extraCandies` (the number of extra candies you have), determine for **each kid** whether giving them all `extraCandies` would let them have the **greatest** number of candies among all kids (ties count as greatest).
+
+Return a boolean array `result` where `result[i]` is `true` if kid `i` could have the max after receiving the extra candies, else `false`.
+
+**Example:**
+```
+candies = [2, 3, 5, 1, 3], extraCandies = 3
+maxCandies = 5
+result = [false, true, true, false, true]
+```
+
+---
+
+## 🧠 Logic / Approach
+1. Find `maxCandies`, the current maximum in the `candies` array (this is the bar every kid needs to reach after their boost).
+2. For each kid `i`, check if `candies[i] + extraCandies >= maxCandies`.
+   - If yes → that kid *could* have the greatest number of candies → `true`.
+   - If no → `false`.
+3. This only requires **one pass** to find the max and **one pass** to build the result → **O(n) time, O(1) extra space** (excluding output).
+
+**Key insight:** You never need to compare kids against each other directly — just compare each kid's boosted total against the single fixed `maxCandies` value found once up front.
+
+**Common pitfall:** Don't mutate the original `candies` array while iterating (e.g., adding `extraCandies` in place). If earlier elements get permanently boosted before later comparisons happen, the boost effectively cancels out in later checks, producing wrong results.
+
+---
+
+## 💻 C++ Code
+```cpp
+class Solution {
+public:
+    vector<bool> kidsWithCandies(vector<int>& candies, int extraCandies) {
+        int n = candies.size();
+        vector<bool> result(n, false);
+        int maxCandies = *max_element(candies.begin(), candies.end());
+
+        for (int i = 0; i < n; i++) {
+            result[i] = (candies[i] + extraCandies >= maxCandies);
+        }
+        return result;
+    }
+};
+```
+
+**Complexity:**
+- Time: `O(n)`
+- Space: `O(1)` extra (excluding the output vector)
