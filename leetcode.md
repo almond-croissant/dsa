@@ -142,3 +142,53 @@ public:
 **Complexity:**
 - Time: `O(n)`
 - Space: `O(1)` extra (excluding the output vector)
+
+# 605. Can Place Flowers
+
+## Question (short summary)
+You're given a `flowerbed` array of `0`s (empty) and `1`s (planted), and an integer `n`.
+Flowers can't be planted in adjacent plots (no two `1`s next to each other).
+Return `true` if `n` new flowers can be planted without violating the no-adjacent-flowers rule, else `false`.
+
+## Logic
+- Walk through the array once, left to right.
+- At each plot `i`, check if you **can plant** there:
+  1. `flowerbed[i] == 0` (it's empty)
+  2. left neighbor is empty **or doesn't exist** (edge case)
+  3. right neighbor is empty **or doesn't exist** (edge case)
+- If all three hold: plant (`flowerbed[i] = 1`) and decrement `n`.
+- **Greedy works** because planting as early as possible never blocks a spot you'd need later — the plot right after a planted flower can never be used anyway.
+- **Edge-case trick:** instead of special-casing `i == 0` and `i == total - 1`, just treat an out-of-bounds neighbor as `0` (empty):
+  ```cpp
+  int left = (i == 0) ? 0 : flowerbed[i - 1];
+  int right = (i == total - 1) ? 0 : flowerbed[i + 1];
+  ```
+- At the end, return `n <= 0` (all flowers placed).
+
+## C++ Code
+```cpp
+class Solution {
+public:
+    bool canPlaceFlowers(vector<int>& flowerbed, int n) {
+        int total = flowerbed.size();
+
+        for (int i = 0; i < total; i++) {
+            if (flowerbed[i] == 0) {
+                int left = (i == 0) ? 0 : flowerbed[i - 1];
+                int right = (i == total - 1) ? 0 : flowerbed[i + 1];
+
+                if (left == 0 && right == 0) {
+                    flowerbed[i] = 1;
+                    n--;
+                }
+            }
+        }
+
+        return n <= 0;
+    }
+};
+```
+
+## Mistakes I made (compile error notes)
+- Used `flowerbed[i + 1]` / `flowerbed[i - 1]` directly without bounds checks → out-of-bounds risk at array edges.
+- Had a `bool` function with a path that could fall through without a `return` (e.g., loop finishes or array is empty) → `-Wreturn-type` compile error. Always make sure every path in a non-void function returns something.
